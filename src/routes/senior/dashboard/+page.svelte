@@ -1547,20 +1547,6 @@
 		background: #f9f0e0;
 	}
 
-	:global(body) {
-		margin: 0;
-
-		background: #f9f0e0;
-		color: #30291f;
-
-		font-family:
-			"Comic Sans MS",
-			"Comic Sans",
-			cursive;
-
-		-webkit-font-smoothing: antialiased;
-	}
-
 	button,
 	a {
 		font-family: inherit;

@@ -1175,35 +1175,15 @@
 		box-sizing: border-box;
 	}
 
-	:global(html),
-	:global(body) {
+	:global(html) {
 		margin: 0;
-
 		width: 100%;
 		min-height: 100%;
 	}
 
-	:global(body) {
-		font-family:
-			"Comic Sans MS",
-			"Comic Sans",
-			"Chalkboard SE",
-			"Marker Felt",
-			cursive;
-
-		background: #F9F0E0;
-
-		color: #153d30;
-	}
-
 	button,
 	input {
-		font-family:
-			"Comic Sans MS",
-			"Comic Sans",
-			"Chalkboard SE",
-			"Marker Felt",
-			cursive;
+		font-family: inherit;
 	}
 
 

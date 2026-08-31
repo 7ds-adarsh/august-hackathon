@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabase';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import Badge from '$lib/components/Badge.svelte';
+	import MetricCard from '$lib/components/MetricCard.svelte';
 
 	/* =====================================================
 	   STATE
@@ -486,6 +488,12 @@
 
 <svelte:head>
 	<title>{senior.firstName}'s Medicines — Vcare.life</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..500&family=Public+Sans:wght@300..700&display=swap"
+		rel="stylesheet"
+	/>
 </svelte:head>
 
 <div class="app">
@@ -574,27 +582,24 @@
 
 		<!-- METRICS STRIP -->
 		<section class="metrics-grid">
-			<div class="metric-card">
-				<div class="metric-icon total">💊</div>
-				<div>
-					<small>TOTAL MEDICINES</small>
-					<strong>{medications.length}</strong>
-				</div>
-			</div>
-			<div class="metric-card">
-				<div class="metric-icon taken">✓</div>
-				<div>
-					<small>TAKEN TODAY</small>
-					<strong>{takenCount}</strong>
-				</div>
-			</div>
-			<div class="metric-card">
-				<div class="metric-icon pending">⏳</div>
-				<div>
-					<small>PENDING</small>
-					<strong>{pendingCount}</strong>
-				</div>
-			</div>
+			<MetricCard
+				label="TOTAL MEDICINES"
+				value={medications.length}
+				icon="💊"
+				variant="total"
+			/>
+			<MetricCard
+				label="TAKEN TODAY"
+				value={takenCount}
+				icon="✓"
+				variant="taken"
+			/>
+			<MetricCard
+				label="PENDING"
+				value={pendingCount}
+				icon="⏳"
+				variant="pending"
+			/>
 		</section>
 
 		<!-- FILTER TABS -->
@@ -639,16 +644,24 @@
 							</button>
 							<div class="med-details">
 								<h3>{med.name}</h3>
+								<!-- Dosage subtext: contrast-fixed per dashboard pass rules -->
 								<p class="dosage-text">{med.dosage}</p>
 							</div>
-							<span class="status-pill" class:taken={med.taken} class:pending={!med.taken}>
+							<!-- Shared Badge component — warning for pending, success for taken -->
+							<Badge variant={med.taken ? 'success' : 'warning'}>
 								{med.taken ? 'Taken' : 'Pending'}
-							</span>
+							</Badge>
 						</div>
 
 						<div class="med-card-mid">
+							<!-- Clock icon: neutral color — informational only, not destructive -->
 							<div class="time-badge">
-								<span>⏰</span>
+								<span class="time-clock-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<circle cx="12" cy="12" r="10"/>
+										<polyline points="12 6 12 12 16 14"/>
+									</svg>
+								</span>
 								<span>{med.scheduled_time}</span>
 							</div>
 						</div>
@@ -664,6 +677,20 @@
 						</div>
 					</div>
 				{/each}
+
+				<!-- Ghost 'add next medicine' prompt for sparse lists -->
+				{#if filteredMeds.length > 0 && filteredMeds.length < 3 && filter === 'all'}
+					<button class="ghost-add-card" onclick={() => showAddModal = true}>
+						<div class="ghost-add-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<line x1="12" y1="5" x2="12" y2="19"/>
+								<line x1="5" y1="12" x2="19" y2="12"/>
+							</svg>
+						</div>
+						<span class="ghost-add-label">Add another medicine</span>
+						<span class="ghost-add-sub">Keep {senior.firstName}'s schedule complete</span>
+					</button>
+				{/if}
 			</div>
 		{/if}
 
@@ -742,21 +769,6 @@
 {/if}
 
 <style>
-	:global(*) {
-		box-sizing: border-box;
-	}
-
-	:global(html), :global(body) {
-		margin: 0;
-		min-height: 100%;
-	}
-
-	:global(body) {
-		background: #f7f0e2;
-		color: #173f31;
-		font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Marker Felt", cursive;
-	}
-
 	button, a, input {
 		font-family: inherit;
 	}
@@ -912,12 +924,13 @@
 		font-size: 15px;
 	}
 
-	/* MAIN */
+	/* MAIN — constrained so sparse lists don't float in dead space */
 	.main {
 		width: 100%;
-		max-width: 1500px;
+		/* Tighter max-width than the dashboard: medicines list reads better narrower */
+		max-width: 960px;
 		margin: 0 auto;
-		padding: 34px clamp(30px, 4vw, 65px) 45px;
+		padding: 34px clamp(24px, 4vw, 56px) 48px;
 	}
 
 	.topbar {
@@ -928,9 +941,10 @@
 		margin-bottom: 26px;
 	}
 
-	.date { margin: 0 0 5px; color: #85745f; font-size: 11px; }
-	.topbar h1 { margin: 0; font-size: clamp(24px, 2.5vw, 34px); color: #0b3d2b; }
-	.intro { margin: 6px 0 0; color: #72624d; font-size: 13px; }
+	.date { margin: 0 0 5px; color: #4b6357; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+	/* Fraunces serif — display headline only, exactly as established on dashboard */
+	.topbar h1 { margin: 0; font-size: clamp(24px, 2.5vw, 34px); color: #0b3d2b; font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -0.02em; }
+	.intro { margin: 6px 0 0; color: #475569; font-size: 14px; }
 
 	.top-actions { display: flex; gap: 12px; align-items: center; }
 
@@ -1003,33 +1017,6 @@
 		margin-bottom: 26px;
 	}
 
-	.metric-card {
-		background: white;
-		padding: 20px;
-		border-radius: 18px;
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		border: 1px solid #ebe0cc;
-		box-shadow: 0 4px 18px rgba(23,63,49,0.04);
-	}
-
-	.metric-icon {
-		width: 46px;
-		height: 46px;
-		border-radius: 14px;
-		display: grid;
-		place-items: center;
-		font-size: 20px;
-	}
-
-	.metric-icon.total { background: #e8f0fe; color: #1a73e8; }
-	.metric-icon.taken { background: #e6f7eb; color: #137333; }
-	.metric-icon.pending { background: #fef7e0; color: #b06000; }
-
-	.metric-card small { display: block; font-size: 10px; color: #8a7a66; letter-spacing: 0.8px; }
-	.metric-card strong { font-size: 24px; color: #173f31; }
-
 	/* FILTER BAR */
 	.filter-bar {
 		display: flex;
@@ -1064,11 +1051,62 @@
 		box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 	}
 
-	/* MEDS GRID */
+	/* MEDS GRID — single column when max-width makes the page narrower */
 	.meds-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
 		gap: 20px;
+	}
+
+	/* Ghost add-medicine prompt for short lists (< 3 items) */
+	.ghost-add-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 28px 22px;
+		border: 1.5px dashed #c8d8d0;
+		border-radius: 20px;
+		background: #f9fbfa;
+		cursor: pointer;
+		transition: border-color 0.18s ease, background 0.18s ease;
+		width: 100%;
+		text-align: center;
+		/* Reset button appearance */
+		outline: none;
+		font-family: inherit;
+	}
+
+	.ghost-add-card:hover {
+		border-color: #4e9e72;
+		background: #f0fdf4;
+	}
+
+	.ghost-add-icon {
+		width: 40px;
+		height: 40px;
+		display: grid;
+		place-items: center;
+		border-radius: 12px;
+		background: #e8f7ee;
+		color: #166534;
+		transition: background 0.18s ease;
+	}
+
+	.ghost-add-card:hover .ghost-add-icon {
+		background: #dcfce7;
+	}
+
+	.ghost-add-label {
+		color: #166534;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.ghost-add-sub {
+		color: #4b5563;
+		font-size: 12px;
 	}
 
 	.med-card {
@@ -1127,20 +1165,11 @@
 	}
 
 	.med-details { flex: 1; }
-	.med-details h3 { margin: 0; font-size: 17px; color: #173f31; }
-	.dosage-text { margin: 4px 0 0; color: #72624d; font-size: 12px; }
+	.med-details h3 { margin: 0; font-size: 17px; color: #173f31; font-weight: 700; }
+	/* Dosage contrast fix — same rule as dashboard pass (#475569 ≥4.5:1 on white) */
+	.dosage-text { margin: 4px 0 0; color: #475569; font-size: 13px; }
 
-	.status-pill {
-		padding: 4px 10px;
-		border-radius: 8px;
-		font-size: 10px;
-		font-weight: bold;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	.status-pill.taken { background: #d7f5dd; color: #0b6845; }
-	.status-pill.pending { background: #fff0d4; color: #b86200; }
+	/* .status-pill removed — replaced by shared Badge component imported from $lib/components/Badge.svelte */
 
 	.med-card-mid {
 		display: flex;
@@ -1152,12 +1181,22 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		background: #f4ecdc;
+		background: #f1f4f2;
+		border: 1px solid #dde4df;
 		padding: 6px 12px;
 		border-radius: 10px;
-		font-size: 12px;
-		font-weight: bold;
-		color: #4b3e2d;
+		font-size: 13px;
+		font-weight: 600;
+		/* Neutral slate — informational only, not destructive (clock was red before) */
+		color: #334e44;
+	}
+
+	/* Clock SVG icon — neutral to distinguish from the red delete action */
+	.time-clock-icon {
+		display: flex;
+		align-items: center;
+		/* Muted teal-gray, clearly not an alert color */
+		color: #527568;
 	}
 
 	.med-card-actions {

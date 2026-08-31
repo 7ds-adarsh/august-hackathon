@@ -635,18 +635,6 @@
 		background: #fbf2e3;
 	}
 
-	:global(body) {
-		margin: 0;
-		background: #fbf2e3;
-		font-family:
-			Inter,
-			-apple-system,
-			BlinkMacSystemFont,
-			"Segoe UI",
-			sans-serif;
-		color: #294537;
-	}
-
 	button,
 	input {
 		font: inherit;

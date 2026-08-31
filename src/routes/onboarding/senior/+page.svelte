@@ -974,36 +974,16 @@ const countryCodes = [
     box-sizing: border-box;
   }
 
-  :global(html),
-  :global(body) {
+  :global(html) {
     margin: 0;
-
     width: 100%;
     min-height: 100%;
-  }
-
-  :global(body) {
-    font-family:
-      "Comic Sans MS",
-      "Comic Sans",
-      "Chalkboard SE",
-      "Marker Felt",
-      cursive;
-
-    background: #F9F0E0;
-
-    color: #153d30;
   }
 
   button,
   input,
   select {
-    font-family:
-      "Comic Sans MS",
-      "Comic Sans",
-      "Chalkboard SE",
-      "Marker Felt",
-      cursive;
+    font-family: inherit;
   }
 
 
@@ -2666,7 +2646,7 @@ const countryCodes = [
     box-shadow: none;
     outline: none;
 
-    font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+    font-family: inherit;
     font-size: 15px;
     font-weight: bold;
 
@@ -2691,7 +2671,7 @@ const countryCodes = [
     box-shadow: none;
     outline: none;
 
-    font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+    font-family: inherit;
     font-size: 16px;
 
     color: #322b25;
@@ -2737,7 +2717,7 @@ const countryCodes = [
     align-items: center;
     gap: 8px;
 
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
     font-size: 18px;
     font-weight: bold;
 
@@ -2781,7 +2761,7 @@ const countryCodes = [
     background: #fffaf0;
     color: #342c23;
 
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
     font-size: 15px;
 
     outline: none;
@@ -2810,7 +2790,7 @@ const countryCodes = [
     gap: 10px;
 
     color: #342c23;
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
     font-size: 15px;
 
     cursor: pointer;
@@ -2830,7 +2810,7 @@ const countryCodes = [
     padding: 18px;
     text-align: center;
     color: #776f63;
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
 }
 
 .phone-input {
@@ -2864,7 +2844,7 @@ const countryCodes = [
 
     color: #315b3d;
 
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
     font-size: 15px;
     font-weight: bold;
 
@@ -2934,7 +2914,7 @@ const countryCodes = [
     cursor: pointer;
 
     color: #342c23;
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: inherit;
 }
 
 .country-option:hover {
