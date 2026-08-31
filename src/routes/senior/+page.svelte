@@ -441,7 +441,6 @@
     padding: 0;
     min-height: 100%;
   }
-  }
 
   :global(button) {
     font-family: inherit;

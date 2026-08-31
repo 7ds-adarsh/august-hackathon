@@ -497,25 +497,9 @@
   :global(html) {
     margin: 0;
     padding: 0;
-
     width: 100%;
     min-height: 100%;
   }
-
-  .auth-viewport {
-    /* Public Sans — matches landing page */
-    font-family:
-      "Public Sans",
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
-
-    background: #f7f5eb;
-
-    color: #153d32;
-  }
-
 
   :global(button),
   :global(input) {

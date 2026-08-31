@@ -766,8 +766,7 @@
 
 <style>
 	button,
-	a,
-	input {
+	a {
 		font-family: inherit;
 	}
 
