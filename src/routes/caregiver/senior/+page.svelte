@@ -4,6 +4,7 @@
 	import { supabase } from '$lib/supabase';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import Badge from '$lib/components/Badge.svelte';
+	import PhoneInput, { countryCodes } from '$lib/components/PhoneInput.svelte';
 
 	/* =====================================================
 	   STATE
@@ -25,6 +26,24 @@
 		emergency_contact_phone: '',
 		role: 'senior'
 	});
+
+	let seniorPhoneLocal = $state('');
+	let seniorPhoneCountry = $state('+91');
+
+	let emergencyPhoneLocal = $state('');
+	let emergencyPhoneCountry = $state('+91');
+
+	function splitPhone(fullPhone) {
+		if (!fullPhone) return { countryCode: '+91', local: '' };
+		const match = countryCodes.find((c) => fullPhone.startsWith(c.code));
+		if (match) {
+			return {
+				countryCode: match.code,
+				local: fullPhone.slice(match.code.length)
+			};
+		}
+		return { countryCode: '+91', local: fullPhone.replace(/^\+91/, '') };
+	}
 
 	let loading = $state(true);
 	let saving = $state(false);
@@ -148,6 +167,14 @@
 				role: 'senior'
 			};
 
+			const pSenior = splitPhone(senior.phone);
+			seniorPhoneCountry = pSenior.countryCode;
+			seniorPhoneLocal = pSenior.local;
+
+			const pEmer = splitPhone(senior.emergency_contact_phone);
+			emergencyPhoneCountry = pEmer.countryCode;
+			emergencyPhoneLocal = pEmer.local;
+
 			// Fast load counts from Supabase directly
 			try {
 				const { data: sbMeds } = await supabase
@@ -179,6 +206,14 @@
 		if (!senior.id) return;
 		saving = true;
 		saveStatus = null;
+
+		const cleanPhone = (val) => (val || '').replace(/\D/g, '');
+		senior.phone = seniorPhoneLocal.trim()
+			? `${seniorPhoneCountry}${cleanPhone(seniorPhoneLocal)}`
+			: '';
+		senior.emergency_contact_phone = emergencyPhoneLocal.trim()
+			? `${emergencyPhoneCountry}${cleanPhone(emergencyPhoneLocal)}`
+			: '';
 
 		try {
 			const { data: { session } } = await supabase.auth.getSession();
@@ -294,11 +329,10 @@
 			<a href="/caregiver/medicines" class="nav-item">
 				<span class="nav-icon" aria-hidden="true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
-						<path d="m8.5 8.5 7 7"/>
+						<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
 					</svg>
 				</span>
-				<span>Medicines</span>
+				<span>Health Routine</span>
 			</a>
 			<a href="/caregiver/calls" class="nav-item">
 				<span class="nav-icon" aria-hidden="true">
@@ -430,13 +464,12 @@
 
 						<div class="field">
 							<label for="phone">Phone Number (used for AI Calls)</label>
-							<input
+							<PhoneInput
 								id="phone"
-								type="tel"
-								bind:value={senior.phone}
-								placeholder="+919876543210"
+								bind:value={seniorPhoneLocal}
+								bind:countryCode={seniorPhoneCountry}
+								placeholder="Phone number"
 							/>
-							<small class="hint">Include country code (e.g. +91)</small>
 						</div>
 
 						<div class="field">
@@ -513,11 +546,11 @@
 
 						<div class="field">
 							<label for="emerPhone">Emergency Contact Phone</label>
-							<input
+							<PhoneInput
 								id="emerPhone"
-								type="tel"
-								bind:value={senior.emergency_contact_phone}
-								placeholder="+919876543210"
+								bind:value={emergencyPhoneLocal}
+								bind:countryCode={emergencyPhoneCountry}
+								placeholder="Phone number"
 							/>
 						</div>
 					</div>

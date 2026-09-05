@@ -29,10 +29,11 @@
 	let showAddModal = $state(false);
 	let callStatus = $state(null); // { type: 'calling' | 'success' | 'error', message: '' }
 
-	// New medication form
+	// New routine item form
 	let newMedName = $state('');
 	let newMedDosage = $state('');
 	let newMedTime = $state('08:00 AM');
+	let newCategory = $state('medicine'); // 'walk' | 'yoga' | 'diet' | 'medicine' | 'health_check'
 	let addError = $state('');
 
 	// Time
@@ -194,7 +195,8 @@
 					dosage: m.dosage,
 					scheduled_time: m.scheduled_time,
 					taken: m.taken,
-					status: m.taken ? 'taken' : 'pending'
+					status: m.taken ? 'taken' : 'pending',
+					category: m.category || 'medicine'
 				}));
 			}
 		} catch (e) {
@@ -297,7 +299,7 @@
 	async function addMedication() {
 		addError = '';
 		if (!newMedName.trim()) {
-			addError = 'Please enter medication name.';
+			addError = 'Please enter a name for this routine item.';
 			return;
 		}
 
@@ -365,11 +367,13 @@
 					dosage: newMed.dosage,
 					scheduled_time: newMed.scheduled_time,
 					taken: false,
-					status: 'pending'
+					status: 'pending',
+					category: newCategory
 				}];
 				newMedName = '';
 				newMedDosage = '';
 				newMedTime = '08:00 AM';
+				newCategory = 'medicine';
 				showAddModal = false;
 			}
 		} catch (err) {
@@ -381,7 +385,7 @@
 	}
 
 	async function deleteMedication(medId) {
-		if (!confirm('Are you sure you want to remove this medication?')) return;
+		if (!confirm('Are you sure you want to remove this routine item?')) return;
 
 		// Optimistic removal
 		medications = medications.filter(m => m.id !== medId);
@@ -439,8 +443,9 @@
 					seniorName: senior.firstName,
 					seniorId: senior.id,
 					medicationId: targetMed?.id,
-					medicationName: targetMed?.name || 'daily medicines',
-					dosage: targetMed?.dosage || 'prescribed dose'
+					medicationName: targetMed?.name || 'daily health check-in',
+					dosage: targetMed?.dosage || 'as planned',
+					category: targetMed?.category || 'medicine'
 				})
 			});
 
@@ -487,7 +492,7 @@
 </script>
 
 <svelte:head>
-	<title>{senior.firstName}'s Medicines — Vcare.life</title>
+	<title>{senior.firstName}'s Health Routine — Vcare.life</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
@@ -516,15 +521,27 @@
 				<span>Home</span>
 			</a>
 			<a href="/caregiver/medicines" class="nav-item active">
-				<span class="nav-icon">✚</span>
-				<span>Medicines</span>
+				<span class="nav-icon" aria-hidden="true">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+					</svg>
+				</span>
+				<span>Health Routine</span>
 			</a>
 			<a href="/caregiver/calls" class="nav-item">
-				<span class="nav-icon">☎</span>
+				<span class="nav-icon" aria-hidden="true">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+					</svg>
+				</span>
 				<span>Vcare Calls</span>
 			</a>
 			<a href="/caregiver/senior" class="nav-item">
-				<span class="nav-icon">♡</span>
+				<span class="nav-icon" aria-hidden="true">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+					</svg>
+				</span>
 				<span>Senior Profile</span>
 			</a>
 		</nav>
@@ -556,8 +573,8 @@
 		<header class="topbar">
 			<div>
 				<p class="date">{currentDate}</p>
-				<h1>{senior.firstName}'s Medicine Schedule</h1>
-				<p class="intro">Manage prescriptions, track daily adherence, and trigger instant AI reminder calls.</p>
+				<h1>{senior.firstName}'s Health & Daily Routine</h1>
+				<p class="intro">Manage walks, yoga, diet, medicines, and wellness habits — and trigger instant AI reminder calls.</p>
 			</div>
 
 			<div class="top-actions">
@@ -566,8 +583,8 @@
 					<span>Call {senior.firstName} Now</span>
 				</button>
 				<button class="btn-primary" onclick={() => showAddModal = true}>
-					<span>✚</span>
-					<span>Add Medicine</span>
+					<span>＋</span>
+					<span>Add Routine Item</span>
 				</button>
 			</div>
 		</header>
@@ -583,13 +600,13 @@
 		<!-- METRICS STRIP -->
 		<section class="metrics-grid">
 			<MetricCard
-				label="TOTAL MEDICINES"
+				label="TOTAL ROUTINES"
 				value={medications.length}
-				icon="💊"
+				icon="📋"
 				variant="total"
 			/>
 			<MetricCard
-				label="TAKEN TODAY"
+				label="COMPLETED TODAY"
 				value={takenCount}
 				icon="✓"
 				variant="taken"
@@ -606,13 +623,13 @@
 		<div class="filter-bar">
 			<div class="filter-pills">
 				<button class="pill" class:active={filter === 'all'} onclick={() => filter = 'all'}>
-					All ({medications.length})
+					All Routines ({medications.length})
 				</button>
 				<button class="pill" class:active={filter === 'pending'} onclick={() => filter = 'pending'}>
 					Pending ({pendingCount})
 				</button>
 				<button class="pill" class:active={filter === 'taken'} onclick={() => filter = 'taken'}>
-					Taken ({takenCount})
+					Completed ({takenCount})
 				</button>
 			</div>
 		</div>
@@ -621,16 +638,16 @@
 		{#if loading}
 			<div class="loading-state">
 				<div class="spinner">♥</div>
-				<p>Loading medicines for {senior.firstName}...</p>
+				<p>Loading health routine for {senior.firstName}...</p>
 			</div>
 		{:else if filteredMeds.length === 0}
 			<div class="empty-card">
-				<div class="empty-icon">✚</div>
-				<h3>No medicines found</h3>
-				<p>{filter === 'all' ? `You haven't added any medicines for ${senior.firstName} yet.` : `No ${filter} medicines right now.`}</p>
+				<div class="empty-icon">📋</div>
+				<h3>No routine items found</h3>
+				<p>{filter === 'all' ? `You haven't added any routine items for ${senior.firstName} yet.` : `No ${filter} items right now.`}</p>
 				{#if filter === 'all'}
 					<button class="btn-primary" onclick={() => showAddModal = true}>
-						<span>✚</span> Add First Medicine
+						<span>＋</span> Add First Routine Item
 					</button>
 				{/if}
 			</div>
@@ -643,8 +660,11 @@
 								{med.taken ? '✓' : '○'}
 							</button>
 							<div class="med-details">
-								<h3>{med.name}</h3>
-								<!-- Dosage subtext: contrast-fixed per dashboard pass rules -->
+								<div class="med-name-row">
+									<span class="category-chip" data-cat={med.category || 'medicine'}>{med.category === 'walk' ? '🚶' : med.category === 'yoga' ? '🧘' : med.category === 'diet' ? '🥗' : med.category === 'health_check' ? '🩺' : '💊'}</span>
+									<h3>{med.name}</h3>
+								</div>
+								<!-- Details / Notes: contrast-fixed per dashboard pass rules -->
 								<p class="dosage-text">{med.dosage}</p>
 							</div>
 							<!-- Shared Badge component — warning for pending, success for taken -->
@@ -667,18 +687,18 @@
 						</div>
 
 						<div class="med-card-actions">
-							<button class="action-btn call" onclick={() => triggerVcareCall(med)} title="Trigger Vcare reminder call for this medicine">
+							<button class="action-btn call" onclick={() => triggerVcareCall(med)} title="Trigger Vcare reminder call for this routine item">
 								<span>☎</span>
 								<span>Remind with AI</span>
 							</button>
-							<button class="action-btn delete" onclick={() => deleteMedication(med.id)} title="Delete medication">
+							<button class="action-btn delete" onclick={() => deleteMedication(med.id)} title="Remove routine item">
 								<span>🗑</span>
 							</button>
 						</div>
 					</div>
 				{/each}
 
-				<!-- Ghost 'add next medicine' prompt for sparse lists -->
+				<!-- Ghost 'add next routine item' prompt for sparse lists -->
 				{#if filteredMeds.length > 0 && filteredMeds.length < 3 && filter === 'all'}
 					<button class="ghost-add-card" onclick={() => showAddModal = true}>
 						<div class="ghost-add-icon" aria-hidden="true">
@@ -687,8 +707,8 @@
 								<line x1="5" y1="12" x2="19" y2="12"/>
 							</svg>
 						</div>
-						<span class="ghost-add-label">Add another medicine</span>
-						<span class="ghost-add-sub">Keep {senior.firstName}'s schedule complete</span>
+						<span class="ghost-add-label">Add another routine item</span>
+						<span class="ghost-add-sub">A walk, yoga session, diet reminder, or medicine</span>
 					</button>
 				{/if}
 			</div>
@@ -698,14 +718,14 @@
 
 </div>
 
-<!-- ADD MEDICINE MODAL -->
+<!-- ADD ROUTINE ITEM MODAL -->
 {#if showAddModal}
 	<div class="modal-overlay" onclick={(e) => { if (e.target === e.currentTarget) showAddModal = false; }} role="dialog" aria-modal="true" tabindex="-1">
 		<div class="modal-card">
 			<header class="modal-header">
 				<div>
-					<p class="eyebrow">NEW PRESCRIPTION</p>
-					<h2>Add Medicine for {senior.firstName}</h2>
+					<p class="eyebrow">NEW ROUTINE ITEM</p>
+					<h2>Add Routine for {senior.firstName}</h2>
 				</div>
 				<button class="modal-close" onclick={() => showAddModal = false}>×</button>
 			</header>
@@ -715,30 +735,45 @@
 			{/if}
 
 			<form onsubmit={(e) => { e.preventDefault(); addMedication(); }}>
+
+				<!-- CATEGORY CHIPS -->
 				<div class="form-group">
-					<label for="medName">Medicine Name & Purpose</label>
-					<input
-						id="medName"
-						type="text"
-						bind:value={newMedName}
-						placeholder="e.g. Metformin (Blood Sugar)"
-						required
-					/>
-					<div class="presets">
-						<span class="preset-label">Quick suggestions:</span>
-						<button type="button" class="preset-tag" onclick={() => { newMedName = 'Metformin 500mg'; newMedDosage = '1 Tablet with meals'; }}>Metformin</button>
-						<button type="button" class="preset-tag" onclick={() => { newMedName = 'Amlodipine 5mg'; newMedDosage = '1 Tablet after lunch'; }}>Amlodipine</button>
-						<button type="button" class="preset-tag" onclick={() => { newMedName = 'Calcium + Vit D3'; newMedDosage = '1 Tablet post dinner'; }}>Calcium</button>
+					<label>Category</label>
+					<div class="category-chips">
+						<button type="button" class="cat-chip" class:active={newCategory === 'walk'} onclick={() => { newCategory = 'walk'; if (!newMedName) newMedName = 'Morning Walk'; if (!newMedDosage) newMedDosage = '30 mins brisk walk'; }}>🚶 Walk</button>
+						<button type="button" class="cat-chip" class:active={newCategory === 'yoga'} onclick={() => { newCategory = 'yoga'; if (!newMedName) newMedName = 'Yoga & Stretching'; if (!newMedDosage) newMedDosage = '20 mins gentle yoga'; }}>🧘 Yoga</button>
+						<button type="button" class="cat-chip" class:active={newCategory === 'diet'} onclick={() => { newCategory = 'diet'; if (!newMedName) newMedName = 'Healthy Meal'; if (!newMedDosage) newMedDosage = 'Balanced diet, avoid sugar'; }}>🥗 Diet</button>
+						<button type="button" class="cat-chip" class:active={newCategory === 'medicine'} onclick={() => { newCategory = 'medicine'; }}>💊 Medicine</button>
+						<button type="button" class="cat-chip" class:active={newCategory === 'health_check'} onclick={() => { newCategory = 'health_check'; if (!newMedName) newMedName = 'BP / Sugar Check'; if (!newMedDosage) newMedDosage = 'Measure and note reading'; }}>🩺 Health Check</button>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="medDosage">Dosage & Instructions</label>
+					<label for="medName">Routine Title</label>
+					<input
+						id="medName"
+						type="text"
+						bind:value={newMedName}
+						placeholder={newCategory === 'walk' ? 'e.g. Morning Walk in park' : newCategory === 'yoga' ? 'e.g. Gentle breathing & yoga' : newCategory === 'diet' ? 'e.g. Warm lemon water' : newCategory === 'health_check' ? 'e.g. BP / Sugar Check' : 'e.g. Metformin 500mg'}
+						required
+					/>
+					{#if newCategory === 'medicine'}
+						<div class="presets">
+							<span class="preset-label">Quick suggestions:</span>
+							<button type="button" class="preset-tag" onclick={() => { newMedName = 'Metformin 500mg'; newMedDosage = '1 Tablet with meals'; }}>Metformin</button>
+							<button type="button" class="preset-tag" onclick={() => { newMedName = 'Amlodipine 5mg'; newMedDosage = '1 Tablet after lunch'; }}>Amlodipine</button>
+							<button type="button" class="preset-tag" onclick={() => { newMedName = 'Calcium + Vit D3'; newMedDosage = '1 Tablet post dinner'; }}>Calcium</button>
+						</div>
+					{/if}
+				</div>
+
+				<div class="form-group">
+					<label for="medDosage">Details / Notes</label>
 					<input
 						id="medDosage"
 						type="text"
 						bind:value={newMedDosage}
-						placeholder="e.g. 1 Tablet after breakfast"
+						placeholder={newCategory === 'walk' ? 'e.g. 30 mins brisk walk' : newCategory === 'yoga' ? 'e.g. 20 mins gentle yoga' : newCategory === 'diet' ? 'e.g. 2 glasses warm water' : newCategory === 'health_check' ? 'e.g. Measure and note reading' : 'e.g. 1 Tablet after breakfast'}
 					/>
 				</div>
 
@@ -751,8 +786,10 @@
 						placeholder="e.g. 08:00 AM"
 					/>
 					<div class="time-presets">
+						<button type="button" class="time-tag" class:active={newMedTime === '06:30 AM'} onclick={() => newMedTime = '06:30 AM'}>🌄 06:30 AM</button>
 						<button type="button" class="time-tag" class:active={newMedTime === '08:00 AM'} onclick={() => newMedTime = '08:00 AM'}>🌅 08:00 AM</button>
-						<button type="button" class="time-tag" class:active={newMedTime === '02:00 PM'} onclick={() => newMedTime = '02:00 PM'}>☀️ 02:00 PM</button>
+						<button type="button" class="time-tag" class:active={newMedTime === '12:00 PM'} onclick={() => newMedTime = '12:00 PM'}>☀️ 12:00 PM</button>
+						<button type="button" class="time-tag" class:active={newMedTime === '05:00 PM'} onclick={() => newMedTime = '05:00 PM'}>🌇 05:00 PM</button>
 						<button type="button" class="time-tag" class:active={newMedTime === '08:30 PM'} onclick={() => newMedTime = '08:30 PM'}>🌙 08:30 PM</button>
 					</div>
 				</div>
@@ -760,7 +797,7 @@
 				<footer class="modal-footer">
 					<button type="button" class="btn-cancel" onclick={() => showAddModal = false}>Cancel</button>
 					<button type="submit" class="btn-submit" disabled={saving}>
-						{saving ? 'Saving...' : 'Save Medicine'}
+						{saving ? 'Saving...' : 'Save Routine Item'}
 					</button>
 				</footer>
 			</form>
@@ -1385,4 +1422,45 @@
 	}
 
 	.btn-submit:hover { background: #074e33; }
+
+	/* CATEGORY CHIPS — modal */
+	.category-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 6px;
+	}
+
+	.cat-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 7px 14px;
+		border-radius: 10px;
+		border: 1.5px solid #d9cdb8;
+		background: #fdfbf7;
+		font-size: 13px;
+		font-weight: 600;
+		color: #3b3022;
+		cursor: pointer;
+		transition: 0.18s ease;
+	}
+
+	.cat-chip:hover { border-color: #0b6845; background: #f0fdf4; }
+	.cat-chip.active { background: #0b6845; color: white; border-color: #0b6845; }
+
+	/* CATEGORY ICON in med card */
+	.med-name-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.med-name-row h3 { margin: 0; font-size: 17px; color: #173f31; font-weight: 700; }
+
+	.category-chip {
+		font-size: 16px;
+		line-height: 1;
+		flex-shrink: 0;
+	}
 </style>

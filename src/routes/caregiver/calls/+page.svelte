@@ -360,11 +360,10 @@
 			<a href="/caregiver/medicines" class="nav-item">
 				<span class="nav-icon" aria-hidden="true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
-						<path d="m8.5 8.5 7 7"/>
+						<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
 					</svg>
 				</span>
-				<span>Medicines</span>
+				<span>Health Routine</span>
 			</a>
 			<a href="/caregiver/calls" class="nav-item active">
 				<span class="nav-icon" aria-hidden="true">

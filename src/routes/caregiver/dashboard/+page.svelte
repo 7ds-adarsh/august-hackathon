@@ -391,11 +391,10 @@
 			<a href="/caregiver/medicines" class="nav-item">
 				<span class="nav-icon" aria-hidden="true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
-						<path d="m8.5 8.5 7 7"/>
+						<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
 					</svg>
 				</span>
-				<span>Medicines</span>
+				<span>Health Routine</span>
 			</a>
 
 			<a href="/caregiver/calls" class="nav-item">
@@ -542,43 +541,43 @@
 		<section class="dashboard-grid">
 
 			<!-- =================================================
-			     MEDICATIONS
+			     HEALTH & DAILY ROUTINE (MEDICATIONS, WALKS, YOGA, DIET)
 			================================================= -->
 			<article class="panel medication-panel">
 				<div class="panel-header">
 					<div>
 						<p class="eyebrow">TODAY</p>
-						<h2>{senior.firstName}'s medicines</h2>
-						<span class="panel-subtitle">A quick look at today's medication.</span>
+						<h2>{senior.firstName}'s Daily Routine</h2>
+						<span class="panel-subtitle">Today's medicines, walks, yoga, and wellness habits.</span>
 					</div>
 					<div class="panel-icon medicine-icon" aria-hidden="true">
-						💊
+						🌿
 					</div>
 				</div>
 
 				<div class="medicine-list">
 					{#if medications.length === 0}
 						<div class="empty-state">
-							<p>No medications scheduled for today.</p>
+							<p>No routine items scheduled for today.</p>
 						</div>
 					{:else}
-						{#each medications as medicine}
+						{#each medications as item}
 							<div class="medicine-row">
 								<div
 									class="medicine-check"
-									class:taken={medicine.status === 'taken'}
+									class:taken={item.status === 'taken'}
 									aria-hidden="true"
 								>
-									{medicine.status === 'taken' ? '✓' : '○'}
+									{item.status === 'taken' ? '✓' : '○'}
 								</div>
 
 								<div class="medicine-info">
-									<strong>{medicine.name}</strong>
-									<span class="medicine-meta">{medicine.dosage} · {medicine.time}</span>
+									<strong>{item.name}</strong>
+									<span class="medicine-meta">{item.dosage ? `${item.dosage} · ` : ''}{item.time}</span>
 								</div>
 
-								<Badge variant={medicine.status === 'taken' ? 'success' : 'warning'}>
-									{medicine.status === 'taken' ? 'Taken' : 'Pending'}
+								<Badge variant={item.status === 'taken' ? 'success' : 'warning'}>
+									{item.status === 'taken' ? 'Completed' : 'Pending'}
 								</Badge>
 							</div>
 						{/each}
@@ -587,10 +586,10 @@
 
 				<div class="panel-actions">
 					<button class="add-button" onclick={openMedicines}>
-						<span>＋</span> Add medicine
+						<span>＋</span> Add routine item
 					</button>
 					<button class="text-button" onclick={openMedicines}>
-						View all <span>→</span>
+						View all routines <span>→</span>
 					</button>
 				</div>
 			</article>

@@ -430,11 +430,11 @@
 
 
 			<a href="/senior/medications" class="nav-link">
-    <span class="nav-icon">✚</span>
+    <span class="nav-icon">📋</span>
 
     <div>
-        <strong>Medicines</strong>
-        <small>Your medication plan</small>
+        <strong>Health Routine</strong>
+        <small>Walks, yoga, medicines & more</small>
     </div>
 </a>
 
@@ -770,16 +770,16 @@
 								TODAY
 							</p>
 
-							<h2>Your medicines</h2>
+							<h2>Your Daily Routine</h2>
 
 							<span class="panel-subtitle">
-								Stay on track with today's medication.
+								Stay on track with today's routine — walks, yoga, and medicines.
 							</span>
 						</div>
 
 
 						<div class="panel-icon medicine-panel-icon">
-							✚
+							📋
 						</div>
 
 					</div>
@@ -841,7 +841,7 @@
 											onclick={() =>
 												markMedicineTaken(medicine.id)}
 										>
-											I took this
+											I completed this
 										</button>
 
 									{/if}
